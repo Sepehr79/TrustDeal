@@ -1,0 +1,11 @@
+.App {
+    text-align: center;
+}
+
+input[type='text'] {
+    width: 100px;
+}
+
+input[type='submit'] {
+    width: 70px;
+}
