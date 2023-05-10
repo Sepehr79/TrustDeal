@@ -60,13 +60,23 @@ const FundsManagement = ({ contractInstance, account }) => {
                     <input type='submit' value="withdraw"/>
                 </form>
             </label>
-            <p>Actual funds: { funds.actual / 10**18 } eth </p>
-            <p>Locked funds: { funds.locked / 10**18 } eth </p>
-
-
-            <Link to='/'>Home</Link><br />
-            <Link to='/createTask'>Create new task</Link><br />
-            <Link to='/manageTask'>Manage task</Link>
+            <br /> 
+            <ul>
+                <li>Actual Funds: { funds.actual / 10**18 } Eth </li>
+                <li>Locked Funds: { funds.locked / 10**18 } Eth </li>
+            </ul>
+            <br />
+            <ul>
+                <li>
+                    <Link to='/'>Home</Link>
+                </li>
+                <li>
+                    <Link to='/createTask'>Create new task</Link>
+                </li>
+                <li>
+                    <Link to='/manageTask'>Manage task</Link>
+                </li>
+            </ul>
             <Outlet />
         </div>
     )

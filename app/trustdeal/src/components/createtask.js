@@ -9,7 +9,7 @@ const CreateTask = ({ contractInstance, account }) => {
 
     return (
         <div className="App">
-            <h3>Create new task</h3>
+            <h3>Create New Task</h3>
             <form onSubmit={event => {
                 event.preventDefault()
                 if(isFinite(event.target.salary.value) && isFinite(event.target.proofOfTrust.value) && isFinite(event.target.workerProofOfTrust.value)) {
@@ -53,8 +53,17 @@ const CreateTask = ({ contractInstance, account }) => {
             </form><br />
             { taskAddr !== '' ? <p> Task address is { taskAddr } </p> : <p></p>  }
 
-            <Link to='/funds'>Manage funds</Link><br />
-            <Link to='/'>Home</Link>
+            <ul>
+                <li>
+                    <Link to='/'>Home</Link>
+                </li>
+                <li>
+                    <Link to='/funds'>Manage Funds</Link>
+                </li>
+                <li>
+                    <Link to='/manageTask'>Manage Task</Link>
+                </li>
+            </ul>
         </div>
     )
 

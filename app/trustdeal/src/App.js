@@ -32,14 +32,17 @@ function App() {
     let contractInstance = new web3js.eth.Contract(contractABI, contractAddress)
 
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
-          <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
-          <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
-        </Routes>
-      </BrowserRouter>
+      <>
+        <h1>TrustExchange</h1>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
+            <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
+            <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
+          </Routes>
+        </BrowserRouter>
+      </>
     );
   } else {
     return (

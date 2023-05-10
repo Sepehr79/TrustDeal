@@ -5,18 +5,17 @@ const Home = () => {
 
     return (
         <div className="App">
-            <h1>Welcome</h1>
-            <p>Metamask wallet is installed</p>
-
-            <p>
-                <Link to='/funds'>Manage funds</Link> <br />
-            </p>
-            <p>
-                <Link to='/createTask'>Create new task</Link>
-            </p>
-            <p>
-                <Link to='/manageTask'>Manage task</Link>
-            </p>
+            <ul>
+                <li>
+                    <Link to='/funds'>Deposit & Withdraw Funds</Link>
+                </li>
+                <li>
+                    <Link to='/createTask'>Create New Task</Link>
+                </li>
+                <li>
+                    <Link to='/manageTask'>Manage Task</Link>
+                </li>
+            </ul>
             
 
             <Outlet />
