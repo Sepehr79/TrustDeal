@@ -6,13 +6,14 @@ import { Link, Outlet } from 'react-router-dom'
 const FundsManagement = ({ contractInstance, account }) => {
 
     const [funds, setFunds] = useState({actual: '0', locked: '0'})
+    
     useEffect(() => {
         if(account !== '') {
             readFunds()
         }
     }, [account])
 
-    function readFunds() {
+    async function readFunds() {
         contractInstance.methods.ownerToFunds(account).call()
         .then(funds => {
             setFunds(funds)
@@ -63,7 +64,8 @@ const FundsManagement = ({ contractInstance, account }) => {
             <p>Locked funds: { funds.locked / 10**18 } eth </p>
 
 
-            <Link to='/'>Home</Link>
+            <Link to='/'>Home</Link><br />
+            <Link to='/createTask'>Create new task</Link>
             <Outlet />
         </div>
     )

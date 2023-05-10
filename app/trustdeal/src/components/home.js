@@ -9,7 +9,8 @@ const Home = () => {
 
             <ul>
                 <li>
-                    <Link to='/funds'>Manage funds</Link>
+                    <Link to='/funds'>Manage funds</Link> <br />
+                    <Link to='/createTask'>Create new task</Link>
                     <Outlet />
                 </li>
             </ul>
