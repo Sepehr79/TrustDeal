@@ -5,6 +5,7 @@ import FundsManagement from './components/Depositfunds';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './components/home';
 import CreateTask from './components/createtask';
+import ManageTask from './components/manageTask';
 
 const options = {
   injectProvider: false,
@@ -36,6 +37,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
           <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
+          <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
         </Routes>
       </BrowserRouter>
     );

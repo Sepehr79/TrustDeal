@@ -65,7 +65,8 @@ const FundsManagement = ({ contractInstance, account }) => {
 
 
             <Link to='/'>Home</Link><br />
-            <Link to='/createTask'>Create new task</Link>
+            <Link to='/createTask'>Create new task</Link><br />
+            <Link to='/manageTask'>Manage task</Link>
             <Outlet />
         </div>
     )
