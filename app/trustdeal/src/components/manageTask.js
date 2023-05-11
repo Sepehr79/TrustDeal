@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import './manageTask.css'
+import TaskTable from "./taskTable"
 
 
 
@@ -15,45 +16,30 @@ const ManageTask = ({ contractInstance, account }) => {
                 event.preventDefault()
                 contractInstance.methods.tasks(event.target.taskAddr.value).call()
                 .then(result => {
-                    setTask(result)
+                    fetch(`http://localhost:8080/tasks/${result.taskAddr}`, {
+                        method: 'get',
+                        headers: {
+                            "content-type": "application/json"
+                        }
+                    }).then(response => { response.json().then(response => {
+                        result.header = response.header
+                        result.description = response.description
+                        setTask(result)
+                    })})
                 })
                 
             }}>
                 <input type='text' name='taskAddr' placeholder="Task address" />
                 <input type='submit' value='Submit' />
             </form>
+            <br /> 
+            <TaskTable account={account} contractInstance={contractInstance} task={task} />
             <br />
             <ul>
                 <li><Link to='/'>Home</Link></li>
                 <li><Link to='/createTask'>Create new task</Link></li>
                 <li><Link to='/funds'>Funds</Link></li>
-            </ul>
-            <br /> 
-                    <table>
-                        <tr>
-                            <td>Header</td>
-                            <td>Description</td>
-                            <td>State</td>
-                            <td>Requester</td>
-                            <td>Salary</td>
-                            <td>Proof of trust</td>
-                            <td>Minimum proof of trust for worker</td>
-                            <td>Worker proof of trust</td>
-                            <td>Worker</td>
-                        </tr>
-                        <tr>
-                            <td>Simple header</td>
-                            <td>Simple description</td>
-                            <td>{ task.state }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.requesterMinimumTrustValueForWorker / 1e18 } Eth</td>
-                            <td>{ task.workerProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.worker }</td>
-                        </tr>
-                    </table> 
-            
+            </ul>    
         </div>
     )
 }
