@@ -24,6 +24,7 @@ const ManageTask = ({ contractInstance, account }) => {
                     }).then(response => { response.json().then(response => {
                         result.header = response.header
                         result.description = response.description
+                        console.log(result)
                         setTask(result)
                     })})
                 })
