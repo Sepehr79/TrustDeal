@@ -8,7 +8,7 @@ const TaskState = {
     "4": "Canceled"
 }
 
-function task_state_create(task, contractInstance, account) {
+function task_state_create(task, contractInstance, account, submitClick) {
     return (
         <div>
             <table>
@@ -21,6 +21,7 @@ function task_state_create(task, contractInstance, account) {
                     <td>Proof of trust</td>
                     <td>Minimum proof of trust for worker</td>
                     <td>Accept task</td>
+                    <td>Cancel task</td>
                         </tr>
                         <tr>
                             <td>{ task.header }</td>
@@ -37,6 +38,7 @@ function task_state_create(task, contractInstance, account) {
                                     .send({ from: account })
                                     .then(result => {
                                         alert("Task state update to accepted")
+                                        submitClick()
                                         console.log(result)
                                     })
                                 }}>
@@ -44,13 +46,22 @@ function task_state_create(task, contractInstance, account) {
                                     <input type='submit' value='Accept task' />
                                 </form>
                             </td>
+                            <td>
+                                <button onClick={event => {
+                                    contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                    .then(result => {
+                                        alert("Task canceled")
+                                        submitClick()
+                                    })
+                                }}>Cancel</button>
+                            </td>
                         </tr>
                     </table>
         </div> 
     )
 }
 
-function task_state_accept(task, contractInstance, account) {
+function task_state_accept(task, contractInstance, account, submitClick) {
     return (
         <div>
             <table>
@@ -64,6 +75,7 @@ function task_state_accept(task, contractInstance, account) {
                     <td>Requester proof of trust</td>
                     <td>Worker proof of trust</td>
                     <td>Done task</td>
+                    <td>Cancel task</td>
                         </tr>
                         <tr>
                             <td>{ task.header }</td>
@@ -81,11 +93,21 @@ function task_state_accept(task, contractInstance, account) {
                                     .send({ from: account })
                                     .then(result => {
                                         alert("Task state updated to done")
+                                        submitClick()
                                         console.log(result)
                                     })
                                 }}>
                             <input type='submit' value='Done task' />
                         </form>
+                    </td>
+                    <td>
+                                <button onClick={event => {
+                                    contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                    .then(result => {
+                                        alert("Task canceled")
+                                        submitClick()
+                                    })
+                                }}>Cancel</button>
                     </td>
                 </tr>
             </table>
@@ -93,7 +115,7 @@ function task_state_accept(task, contractInstance, account) {
     )
 }
 
-function task_state_done(task, contractInstance, account) {
+function task_state_done(task, contractInstance, account, submitClick) {
     return (
         <div>
             <table>
@@ -107,6 +129,7 @@ function task_state_done(task, contractInstance, account) {
                     <td>Requester proof of trust</td>
                     <td>Worker proof of trust</td>
                     <td>Finish task</td>
+                    <td>Cancel task</td>
                         </tr>
                         <tr>
                             <td>{ task.header }</td>
@@ -124,12 +147,22 @@ function task_state_done(task, contractInstance, account) {
                                     .send({ from: account })
                                     .then(result => {
                                         alert("Task state updated to finished")
+                                        submitClick()
                                         console.log(result)
                                     })
                                 }}>
-                            <input type='submit' value='Done task' />
+                            <input type='submit' value='Finish task' />
                         </form>
                     </td>
+                    <td>
+                                <button onClick={event => {
+                                    contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                    .then(result => {
+                                        alert("Task canceled")
+                                        submitClick()
+                                    })
+                                }}>Cancel</button>
+                            </td>
                 </tr>
             </table>
         </div> 
@@ -194,13 +227,13 @@ function task_state_cancel(task) {
     )
 }
 
-const TaskTable = ({ task, contractInstance, account }) => {
+const TaskTable = ({ task, contractInstance, account, submitClick }) => {
 
     
     switch(task.state) {
-        case "0": return task_state_create(task, contractInstance, account)
-        case "1": return task_state_accept(task, contractInstance, account)
-        case "2": return task_state_done(task, contractInstance, account)
+        case "0": return task_state_create(task, contractInstance, account, submitClick)
+        case "1": return task_state_accept(task, contractInstance, account, submitClick)
+        case "2": return task_state_done(task, contractInstance, account, submitClick)
         case "3": return task_state_finish(task)
         case "4": return task_state_cancel(task)
         default: return ( <p>Enter task address to see</p> ) 

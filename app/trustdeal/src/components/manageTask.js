@@ -9,6 +9,10 @@ const ManageTask = ({ contractInstance, account }) => {
 
     const [task, setTask] = useState('')
 
+    function clickSubmit () {
+        document.getElementById('submit').click()
+    }
+
     return (
         <div>
 
@@ -31,10 +35,10 @@ const ManageTask = ({ contractInstance, account }) => {
                 
             }}>
                 <input type='text' name='taskAddr' placeholder="Task address" />
-                <input type='submit' value='Submit' />
+                <input id="submit" type='submit' value='Submit' />
             </form>
             <br /> 
-            <TaskTable account={account} contractInstance={contractInstance} task={task} />
+            <TaskTable account={account} contractInstance={contractInstance} task={task} submitClick={clickSubmit} />
             <br />
             <ul>
                 <li><Link to='/'>Home</Link></li>
