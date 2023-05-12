@@ -20,14 +20,16 @@ const contractAddress = '0xab9D4895db3246F178A032893746172d6532b41a'
 
 function App() {
   const [account, setAccount] = useState('')
-  useEffect(()=> {
-    web3js.eth.getAccounts()
-      .then(accounts => {
-        setAccount(accounts[0])
-      })
-  })
 
   if (provider.isMetaMask) {
+    web3js.eth.getAccounts()
+    .then(accounts => { setAccount(accounts[0]) })
+  
+
+    window.ethereum.on('accountsChanged', function (accounts) {
+      setAccount(accounts[0])
+    })
+
     window.ethereum.enable();    
     let contractInstance = new web3js.eth.Contract(contractABI, contractAddress)
 

@@ -13,7 +13,7 @@ const FundsManagement = ({ contractInstance, account }) => {
         }
     }, [account])
 
-    async function readFunds() {
+    function readFunds() {
         contractInstance.methods.ownerToFunds(account).call()
         .then(funds => {
             setFunds(funds)
@@ -28,10 +28,12 @@ const FundsManagement = ({ contractInstance, account }) => {
                     event.preventDefault()
                     if(isFinite(event.target.depositFunds.value)) {
                         contractInstance.methods.deposit().send({ from: account, value: ethToWei(event.target.depositFunds.value) })
+                        .then(response => {
+                            readFunds()
+                        })
                         console.log(`Transaction account: ${account} value: ${event.target.depositFunds.value}`)
                         event.target.depositFunds.value = ''
                         event.target.depositFunds.style.backgroundColor = ''
-                        setInterval(readFunds, 5000)
                     } else {
                         event.target.depositFunds.value = ''
                         event.target.depositFunds.style.backgroundColor = 'red'
@@ -47,9 +49,11 @@ const FundsManagement = ({ contractInstance, account }) => {
                     event.preventDefault()
                     if(isFinite(event.target.withdrawFunds.value)) {
                         contractInstance.methods.withdraw((event.target.withdrawFunds.value * 1e18).toFixed()).send({ from: account })
+                        .then(response => {
+                            readFunds()
+                        })
                         event.target.withdrawFunds.value = ''
                         event.target.withdrawFunds.style.backgroundColor = ''
-                        setInterval(readFunds, 5000)
                     } else {
                         event.target.withdrawFunds.value = ''
                         event.target.withdrawFunds.style.backgroundColor = 'red'
