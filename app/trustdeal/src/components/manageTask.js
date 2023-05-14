@@ -35,16 +35,20 @@ const ManageTask = ({ contractInstance, account }) => {
                 
             }}>
                 <input type='text' name='taskAddr' placeholder="Task address" />
-                <input id="submit" type='submit' value='Submit' />
+                <input className="btn-primary" id="submit" type='submit' value='Submit' />
             </form>
             <br /> 
             <TaskTable account={account} contractInstance={contractInstance} task={task} submitClick={clickSubmit} />
             <br />
-            <ul>
-                <li><Link to='/'>Home</Link></li>
-                <li><Link to='/createTask'>Create new task</Link></li>
-                <li><Link to='/funds'>Funds</Link></li>
-            </ul>    
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/'>Home</Link>
+            </button><br></br>
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/funds'>Manage Funds</Link>
+            </button><br></br>
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/createTask'>Create new task</Link>
+            </button><br></br>
         </div>
     )
 }

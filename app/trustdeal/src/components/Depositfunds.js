@@ -70,17 +70,22 @@ const FundsManagement = ({ contractInstance, account }) => {
                 <li>Locked Funds: { funds.locked / 10**18 } Eth </li>
             </ul>
             <br />
-            <ul>
-                <li>
-                    <Link to='/'>Home</Link>
-                </li>
-                <li>
-                    <Link to='/createTask'>Create new task</Link>
-                </li>
-                <li>
-                    <Link to='/manageTask'>Manage task</Link>
-                </li>
-            </ul>
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/'>Home</Link>
+            </button><br></br>
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/createTask'>Create New Task</Link>
+            </button><br></br>
+            <button className="btn btn-primary w-25 m-1">
+                <Link className="text-white text-decoration-none h6" to='/manageTask'>Manage Task</Link>
+            </button><br></br>
+            
+                    
+                
+                    
+                
+                    
+                
             <Outlet />
         </div>
     )

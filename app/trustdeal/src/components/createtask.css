@@ -1,7 +1,4 @@
-.App {
-    /* text-align: center; */
-}
-
-.App input {
-    width: 200px;
+.center_div{
+    margin: 0 auto;
+    width:80% /* value of your choice which suits your alignment */
 }

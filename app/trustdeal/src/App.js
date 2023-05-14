@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './components/home';
 import CreateTask from './components/createtask';
 import ManageTask from './components/manageTask';
+import 'bootstrap/dist/css/bootstrap.css';
+
 
 const options = {
   injectProvider: false,
@@ -34,17 +36,21 @@ function App() {
     let contractInstance = new web3js.eth.Contract(contractABI, contractAddress)
 
     return (
-      <>
-        <h1>TrustExchange</h1>
-        <BrowserRouter>
-          <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
-            <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
-            <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
-          </Routes>
-        </BrowserRouter>
-      </>
+      <div>
+        <div className='container-fluid p-5 text-black text-center'>
+            <h1 className='display-3'>TrustExchange</h1>
+        </div>
+        <div className='container-fluid text-center'>
+          <BrowserRouter>
+              <Routes>
+                <Route path='/' element={<Home />} />
+                <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
+                <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
+                <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
+              </Routes>
+            </BrowserRouter>
+          </div>
+      </div>
     );
   } else {
     return (
