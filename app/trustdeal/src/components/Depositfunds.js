@@ -22,8 +22,8 @@ const FundsManagement = ({ contractInstance, account }) => {
     return (
         <div className='App'>
             <h3> Deposit & Withdraw funds </h3>
-            <label>
-                <form onSubmit={event => {
+            
+                <form className='m-1' onSubmit={event => {
                     event.preventDefault()
                     if(isFinite(event.target.depositFunds.value)) {
                         contractInstance.methods.deposit().send({ from: account, value: ethToWei(event.target.depositFunds.value) })
@@ -39,12 +39,10 @@ const FundsManagement = ({ contractInstance, account }) => {
                         event.target.depositFunds.placeholder = "Please enter a valid number"
                     }
                 }}>
-                    <input type='number' step='any' name="depositFunds" placeholder="funds" />
-                    <input type='submit' value="deposit"/>
+                    <input className='w-25' type='number' step='any' name="depositFunds" placeholder="funds" />
+                    <input className='w-25 btn btn-secondary' type='submit' value="deposit"/>
                 </form>
-            </label>
-            <label>
-                <form onSubmit={event => {
+                <form className='m-1' onSubmit={event => {
                     event.preventDefault()
                     if(isFinite(event.target.withdrawFunds.value)) {
                         contractInstance.methods.withdraw((event.target.withdrawFunds.value * 1e18).toFixed()).send({ from: account })
@@ -59,14 +57,13 @@ const FundsManagement = ({ contractInstance, account }) => {
                         event.target.withdrawFunds.placeholder = "Please enter a valid number"
                     }
                 }}>
-                    <input type='number' step='any' name="withdrawFunds" placeholder="funds" />
-                    <input type='submit' value="withdraw"/>
+                    <input className='w-25' type='number' step='any' name="withdrawFunds" placeholder="funds" />
+                    <input className='w-25 btn btn-secondary' type='submit' value="withdraw"/>
                 </form>
-            </label>
             <br /> 
             <ul>
-                <li>Actual Funds: { funds.actual / 10**18 } Eth </li>
-                <li>Locked Funds: { funds.locked / 10**18 } Eth </li>
+                <li>Actual Funds <span className='badge bg-info'> { funds.actual / 10**18 } Eth </span> </li>
+                <li>Locked Funds <span className='badge bg-info'> { funds.locked / 10**18 } Eth </span> </li>
             </ul>
             <br />
             <button className="btn btn-primary w-25 m-1">
@@ -78,13 +75,6 @@ const FundsManagement = ({ contractInstance, account }) => {
             <button className="btn btn-primary w-25 m-1">
                 <Link className="text-white text-decoration-none h6" to='/manageTask'>Manage Task</Link>
             </button><br></br>
-            
-                    
-                
-                    
-                
-                    
-                
             <Outlet />
         </div>
     )
