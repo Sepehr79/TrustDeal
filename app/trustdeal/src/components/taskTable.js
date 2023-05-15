@@ -1,5 +1,3 @@
-import './taskTable.css'
-
 const TaskState = {
     "0": "Created",
     "1": "Accepted",
@@ -11,28 +9,59 @@ const TaskState = {
 function task_state_create(task, contractInstance, account, submitClick) {
     return (
         <div>
-            <table>
+            <table className="table table-bordered table-striped">
                 <tr>
                     <td>Header</td>
-                    <td>Description</td>
-                    <td>State</td>
-                    <td>Requester</td>
-                    <td>Salary</td>
-                    <td>Proof of trust</td>
-                    <td>Minimum proof of trust for worker</td>
+                    <td>{ task.header }</td>
+                </tr>
+                <tr>
+                    <td>
+                        Description
+                    </td>
+                    <td>
+                        { task.description }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        State
+                    </td>
+                    <td>
+                        { TaskState[task.state] }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Requester
+                    </td>
+                    <td>
+                        { task.requester }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Salary
+                    </td>
+                    <td>
+                        { task.salary / 1e18 } Eth
+                    </td>
+                </tr>
+                <tr>
+                <td>Proof of trust</td>
+                    <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                </tr>
+                <tr>
+                    <td>
+                        Minimum proof of trust for worker
+                    </td>
+                    <td>
+                        { task.requesterMinimumTrustValueForWorker / 1e18 } Eth
+                    </td>
+                </tr>
+                <tr>
                     <td>Accept task</td>
-                    <td>Cancel task</td>
-                        </tr>
-                        <tr>
-                            <td>{ task.header }</td>
-                            <td>{ task.description }</td>
-                            <td>{ TaskState[task.state] }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.requesterMinimumTrustValueForWorker / 1e18 } Eth</td>
-                            <td>
-                                <form onSubmit={(event) => {
+                    <td>
+                        <form onSubmit={(event) => {
                                     event.preventDefault()
                                     contractInstance.methods.acceptTask(task.taskAddr, (event.target.proofOfTrust.value * 1e18).toFixed())
                                     .send({ from: account })
@@ -45,18 +74,21 @@ function task_state_create(task, contractInstance, account, submitClick) {
                                     <input type='number' name='proofOfTrust' step='any' placeholder='Prove your trust!' />
                                     <input type='submit' value='Accept task' />
                                 </form>
-                            </td>
-                            <td>
-                                <button onClick={event => {
+                    </td>
+                </tr>
+                <tr>
+                <td>Cancel task</td>
+                <td>
+                    <button onClick={event => {
                                     contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
                                     .then(result => {
                                         alert("Task canceled")
                                         submitClick()
                                     })
-                                }}>Cancel</button>
-                            </td>
-                        </tr>
-                    </table>
+                    }}>Cancel</button>
+                </td>
+                </tr>
+            </table>
         </div> 
     )
 }
@@ -64,30 +96,65 @@ function task_state_create(task, contractInstance, account, submitClick) {
 function task_state_accept(task, contractInstance, account, submitClick) {
     return (
         <div>
-            <table>
-                <tr>
+            <table className="table table-bordered text-center">
+            <tr>
                     <td>Header</td>
-                    <td>Description</td>
-                    <td>State</td>
-                    <td>Requester</td>
+                    <td>{ task.header }</td>
+                </tr>
+                <tr>
+                    <td>
+                        Description
+                    </td>
+                    <td>
+                        { task.description }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        State
+                    </td>
+                    <td>
+                        { TaskState[task.state] }
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Requester
+                    </td>
+                    <td>
+                        { task.requester }
+                    </td>
+                </tr>
+                <tr>
                     <td>Worker</td>
-                    <td>Salary</td>
-                    <td>Requester proof of trust</td>
-                    <td>Worker proof of trust</td>
-                    <td>Done task</td>
-                    <td>Cancel task</td>
-                        </tr>
-                        <tr>
-                            <td>{ task.header }</td>
-                            <td>{ task.description }</td>
-                            <td>{ TaskState[task.state] }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.worker }</td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.workerProofOfTrust / 1e18 } Eth</td>
-                            <td>
-                                <form onSubmit={(event) => {
+                    <td>{ task.worker }</td>
+                </tr>
+                <tr>
+                    <td>
+                        Salary
+                    </td>
+                    <td>
+                        { task.salary / 1e18 } Eth
+                    </td>
+                </tr>
+                <tr>
+                    <td>Proof of trust</td>
+                    <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                </tr>
+                <tr>
+                    <td>
+                       Worker proof of trust
+                    </td>
+                    <td>
+                        { task.workerProofOfTrust / 1e18 } Eth
+                    </td>
+                </tr>
+                <tr>
+                    <td>    
+                        Done task
+                    </td>
+                    <td>
+                    <form onSubmit={(event) => {
                                     event.preventDefault()
                                     contractInstance.methods.doneTask(task.taskAddr)
                                     .send({ from: account })
@@ -100,14 +167,19 @@ function task_state_accept(task, contractInstance, account, submitClick) {
                             <input type='submit' value='Done task' />
                         </form>
                     </td>
+                </tr>
+                <tr>
                     <td>
-                                <button onClick={event => {
+                        Cancel task
+                    </td>
+                    <td>
+                    <button onClick={event => {
                                     contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
                                     .then(result => {
                                         alert("Task canceled")
                                         submitClick()
                                     })
-                                }}>Cancel</button>
+                    }}>Cancel</button>
                     </td>
                 </tr>
             </table>
@@ -118,52 +190,92 @@ function task_state_accept(task, contractInstance, account, submitClick) {
 function task_state_done(task, contractInstance, account, submitClick) {
     return (
         <div>
-            <table>
+            <table className='table table-bordered'>
                 <tr>
-                    <td>Header</td>
-                    <td>Description</td>
-                    <td>State</td>
-                    <td>Requester</td>
-                    <td>Worker</td>
-                    <td>Salary</td>
-                    <td>Requester proof of trust</td>
-                    <td>Worker proof of trust</td>
-                    <td>Finish task</td>
-                    <td>Cancel task</td>
-                        </tr>
-                        <tr>
-                            <td>{ task.header }</td>
-                            <td>{ task.description }</td>
-                            <td>{ TaskState[task.state] }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.worker }</td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.workerProofOfTrust / 1e18 } Eth</td>
-                            <td>
-                                <form onSubmit={(event) => {
-                                    event.preventDefault()
-                                    contractInstance.methods.finishTask(task.taskAddr)
-                                    .send({ from: account })
-                                    .then(result => {
-                                        alert("Task state updated to finished")
-                                        submitClick()
-                                        console.log(result)
-                                    })
-                                }}>
-                            <input type='submit' value='Finish task' />
-                        </form>
-                    </td>
-                    <td>
-                                <button onClick={event => {
-                                    contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
-                                    .then(result => {
-                                        alert("Task canceled")
-                                        submitClick()
-                                    })
-                                }}>Cancel</button>
-                            </td>
-                </tr>
+                        <td>Header</td>
+                        <td>{ task.header }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Description
+                        </td>
+                        <td>
+                            { task.description }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            State
+                        </td>
+                        <td>
+                            { TaskState[task.state] }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Requester
+                        </td>
+                        <td>
+                            { task.requester }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Worker</td>
+                        <td>{ task.worker }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Salary
+                        </td>
+                        <td>
+                            { task.salary / 1e18 } Eth
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Proof of trust</td>
+                        <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        Worker proof of trust
+                        </td>
+                        <td>
+                            { task.workerProofOfTrust / 1e18 } Eth
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>    
+                            Finish task
+                        </td>
+                        <td>
+                        <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.finishTask(task.taskAddr)
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task state updated to finished")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='submit' value='Finish task' />
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Cancel task
+                        </td>
+                        <td>
+                        <button onClick={event => {
+                                        contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                        .then(result => {
+                                            alert("Task canceled")
+                                            submitClick()
+                                        })
+                        }}>Cancel</button>
+                        </td>
+                    </tr>
             </table>
         </div> 
     )
@@ -172,27 +284,59 @@ function task_state_done(task, contractInstance, account, submitClick) {
 function task_state_finish(task) {
     return (
         <div>
-            <table>
-                <tr>
-                    <td>Header</td>
-                    <td>Description</td>
-                    <td>State</td>
-                    <td>Requester</td>
-                    <td>Worker</td>
-                    <td>Salary</td>
-                    <td>Requester proof of trust</td>
-                    <td>Worker proof of trust</td>
-                        </tr>
-                        <tr>
-                            <td>{ task.header }</td>
-                            <td>{ task.description }</td>
-                            <td>{ TaskState[task.state] }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.worker }</td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.workerProofOfTrust / 1e18 } Eth</td>
-                </tr>
+            <table className='table table-bordered'>
+            <tr>
+                        <td>Header</td>
+                        <td>{ task.header }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Description
+                        </td>
+                        <td>
+                            { task.description }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            State
+                        </td>
+                        <td>
+                            { TaskState[task.state] }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Requester
+                        </td>
+                        <td>
+                            { task.requester }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Worker</td>
+                        <td>{ task.worker }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Salary
+                        </td>
+                        <td>
+                            { task.salary / 1e18 } Eth
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Proof of trust</td>
+                        <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        Worker proof of trust
+                        </td>
+                        <td>
+                            { task.workerProofOfTrust / 1e18 } Eth
+                        </td>
+                    </tr>
             </table>
         </div> 
     )
@@ -201,27 +345,59 @@ function task_state_finish(task) {
 function task_state_cancel(task) {
     return (
         <div>
-            <table>
-                <tr>
-                    <td>Header</td>
-                    <td>Description</td>
-                    <td>State</td>
-                    <td>Requester</td>
-                    <td>Worker</td>
-                    <td>Salary</td>
-                    <td>Requester proof of trust</td>
-                    <td>Worker proof of trust</td>
-                        </tr>
-                        <tr>
-                            <td>{ task.header }</td>
-                            <td>{ task.description }</td>
-                            <td>{ TaskState[task.state] }</td>
-                            <td>{ task.requester } </td>
-                            <td>{ task.worker }</td>
-                            <td>{ task.salary / 1e18 } Eth</td>
-                            <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                            <td>{ task.workerProofOfTrust / 1e18 } Eth</td>
-                </tr>
+            <table className='table table-bordered'>
+            <tr>
+                        <td>Header</td>
+                        <td>{ task.header }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Description
+                        </td>
+                        <td>
+                            { task.description }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            State
+                        </td>
+                        <td>
+                            { TaskState[task.state] }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Requester
+                        </td>
+                        <td>
+                            { task.requester }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Worker</td>
+                        <td>{ task.worker }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Salary
+                        </td>
+                        <td>
+                            { task.salary / 1e18 } Eth
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Proof of trust</td>
+                        <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                    </tr>
+                    <tr>
+                        <td>
+                        Worker proof of trust
+                        </td>
+                        <td>
+                            { task.workerProofOfTrust / 1e18 } Eth
+                        </td>
+                    </tr>
             </table>
         </div> 
     )
@@ -236,7 +412,7 @@ const TaskTable = ({ task, contractInstance, account, submitClick }) => {
         case "2": return task_state_done(task, contractInstance, account, submitClick)
         case "3": return task_state_finish(task)
         case "4": return task_state_cancel(task)
-        default: return ( <p>Enter task address to see</p> ) 
+        default: return ( "" ) 
     }
     
 

@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import './manageTask.css'
 import TaskTable from "./taskTable"
 
 
@@ -34,8 +33,8 @@ const ManageTask = ({ contractInstance, account }) => {
                 })
                 
             }}>
-                <input type='text' name='taskAddr' placeholder="Task address" />
-                <input className="btn-primary" id="submit" type='submit' value='Submit' />
+                <input type='text' className="w-25 m-1" name='taskAddr' placeholder="Task address" /><br />
+                <input className="btn btn-secondary w-25 m-1" id="submit" type='submit' value='Search Task' />
             </form>
             <br /> 
             <TaskTable account={account} contractInstance={contractInstance} task={task} submitClick={clickSubmit} />

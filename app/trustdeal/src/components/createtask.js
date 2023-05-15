@@ -1,6 +1,5 @@
-import { Component, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import './createtask.css'
 
 
 const CreateTask = ({ contractInstance, account }) => {
@@ -52,7 +51,7 @@ const CreateTask = ({ contractInstance, account }) => {
                             <input type='number' className="m-1 w-25" step='any' name='workerProofOfTrust' placeholder="Worker proof of trust" /><br /> 
                             <input type='Submit' className="m-1 w-25 btn btn-secondary" value='Create' />                                            
                     </form><br />
-            { taskAddr !== '' ? <p> Task address is { taskAddr } </p> : <p></p>  }
+            { taskAddr !== '' ? <p> Task address: <span style={{color: "blue"}}> { taskAddr } </span> </p> : <p></p>  }
 
 
             <button className="btn btn-primary w-25 m-1">

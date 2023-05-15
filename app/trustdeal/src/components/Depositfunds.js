@@ -1,4 +1,3 @@
-import './Depositfunds.css'
 import ethToWei from '../utils/valueConverter'
 import { useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'

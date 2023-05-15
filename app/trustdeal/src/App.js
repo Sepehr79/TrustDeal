@@ -1,6 +1,6 @@
 import { MetaMaskSDK } from '@metamask/sdk'
 import Web3 from "web3";
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import FundsManagement from './components/Depositfunds';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './components/home';
@@ -24,6 +24,7 @@ function App() {
   const [account, setAccount] = useState('')
 
   if (provider.isMetaMask) {
+    window.ethereum.enable()
     web3js.eth.getAccounts()
     .then(accounts => { setAccount(accounts[0]) })
   
@@ -31,8 +32,7 @@ function App() {
     window.ethereum.on('accountsChanged', function (accounts) {
       setAccount(accounts[0])
     })
-
-    window.ethereum.enable();    
+ 
     let contractInstance = new web3js.eth.Contract(contractABI, contractAddress)
 
     return (
