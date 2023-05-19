@@ -61,10 +61,10 @@ const FundsManagement = ({ contractInstance, account }) => {
                     <input className='w-25 btn btn-secondary' type='submit' value="withdraw"/>
                 </form>
             <br /> 
-            <ul>
-                <li>Actual Funds <span className='badge bg-info'> { funds.actual / 10**18 } Eth </span> </li>
-                <li>Locked Funds <span className='badge bg-info'> { funds.locked / 10**18 } Eth </span> </li>
-            </ul>
+
+                <h4>Actual Funds <span className='badge bg-info'> { funds.actual / 10**18 } Eth </span> </h4>
+                <h4>Locked Funds <span className='badge bg-info'> { funds.locked / 10**18 } Eth </span> </h4>
+
             <br />
             <button className="btn btn-primary w-25 m-1">
                 <Link className="text-white text-decoration-none h6" to='/'>Home</Link>
