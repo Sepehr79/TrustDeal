@@ -3,7 +3,7 @@
 
 TrustExchange is a project that uses smart contracts to facilitate secure and fair exchanges between parties. It allows users to deposit and withdraw funds, create and join tasks. here is state change graph of the specific task:
 
-![state change](./etc/img/imgpsh_fullsize_anim.jpeg)
+![state change](./etc/img/stateGraph2.jpg)
 
 transmission between task states is only available for requester and worker of that task.
 
