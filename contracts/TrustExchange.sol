@@ -115,4 +115,31 @@ contract TrustExchange is Strongbox {
         task.state = TaskState.REJECTED;
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
+
+    function unFinishTask(bytes32 _taskAddr) public {
+        Task storage task = tasks[_taskAddr];
+        require(task.state == TaskState.REJECTED || task.state == TaskState.DONE_BY_WORKER, "Task is not at correct state");
+        require(task.requester == msg.sender || task.worker == msg.sender, "Caller has not premission to finish this task");
+
+        uint repaymentRate = calcRepaymentRate(task);
+
+        uint requesterTaskLockedFund = task.salary + task.requesterProofOfTrust;
+        uint workerTaskLockedFund = task.workerProofOfTrust;
+
+        uint requesterBurnValue = requesterTaskLockedFund * repaymentRate / 100;
+        uint workerBurnValue = workerTaskLockedFund * repaymentRate / 100;
+
+        burn(task.requester, requesterBurnValue);
+        burn(task.worker, workerBurnValue);
+        unlock(task.requester, requesterTaskLockedFund - requesterBurnValue);
+        unlock(task.worker, workerTaskLockedFund - workerBurnValue);
+
+        task.state = TaskState.UNFINISHED;
+        emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
+    }
+
+    function calcRepaymentRate(Task memory task) internal pure returns (uint) {
+        return (((task.salary + (task.requesterProofOfTrust / 4)) * 100) / (task.salary + task.requesterProofOfTrust));
+    }
+
 }

@@ -161,5 +161,41 @@ contract("TrustExchange", (accounts) => {
 
     });
 
+    it("should be able to unfinish a task", async () => {
+        await contractInstance.deposit({from: requester, value: 10e18});
+        await contractInstance.deposit({from: worker, value: 10e18});
+        const taskCreationResult = await contractInstance.createTask(
+            5e18.toFixed(), // Salary
+            5e18.toFixed(), // Requester proof of trust,
+            10e18.toFixed(),  // Requester proof of trust for worker
+            {from: requester}
+        );
+        let taskAddress = taskCreationResult.logs[0].args.taskAddr;
+        await contractInstance.acceptTask(
+            taskAddress,
+            10e18.toFixed(),
+            {from: worker}
+        );
+        await contractInstance.doneTask(
+            taskAddress,
+            {from: worker}
+        );
+        await contractInstance.unFinishTask(
+            taskAddress,
+            {from: requester}
+        );
+        // repaymentRate = ((salary + (requesterProofOfTrust / 4)) / (salary + requesterProofOfTrust))
+        // repaymentRate = ((5 + (5 / 4)) / (5 + 5)) = 0.625
+        // repaymentRate will be 0.62
+        // so unlocked fund is 10 - 10 * 0.62 = 3.8
+        let requesterFunds = await contractInstance.ownerToFunds(requester);
+        let workerFunds = await contractInstance.ownerToFunds(worker);
+        assert.equal(parseInt(requesterFunds.locked), 0);
+        assert.equal(parseInt(requesterFunds.actual) / 1e18.toFixed(), 3.8);
+        assert.equal(parseInt(workerFunds.locked), 0);
+        assert.equal(parseInt(workerFunds.actual) / 1e18.toFixed(), 3.8);
+
+    });
+
 
 })

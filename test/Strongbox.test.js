@@ -28,7 +28,7 @@ contract("Strongbox", (accounts) => {
     })
 
     // This test is disabled becuase lock and burn functions are internal and we cant call them outside of the contract
-    xit("Should be able to burn token when amount is lower than locked value", async () => {
+    xit("Should be able to burn token when amount is lower than locked value then unlock remained", async () => {
         await strongbox.deposit({from: sepehr, value: 5e18.toFixed()});
         await strongbox.lock(sepehr, 3e18.toFixed());
         let fund = await strongbox.ownerToFunds(sepehr);
