@@ -13,7 +13,9 @@ contract TrustExchange is Strongbox {
         ACCEPTED_BY_WORKER,
         DONE_BY_WORKER,
         FINISH_BY_REQUESTER,
-        CANCELED        
+        CANCELED,
+        REJECTED,
+        UNFINISHED   
     }
 
     struct Task {
@@ -67,8 +69,9 @@ contract TrustExchange is Strongbox {
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function doneTask(bytes32 _taskAddr) public CurrentTask(_taskAddr, TaskState.ACCEPTED_BY_WORKER) {
+    function doneTask(bytes32 _taskAddr) public {
         require(tasks[_taskAddr].worker == msg.sender, "Sender is not worker of the task");
+        require(tasks[_taskAddr].state == TaskState.ACCEPTED_BY_WORKER || tasks[_taskAddr].state == TaskState.REJECTED, "Task is not at the correct state");
         tasks[_taskAddr].state = TaskState.DONE_BY_WORKER;
         emit TaskStateChanged(msg.sender, _taskAddr, tasks[_taskAddr].state);
     }
@@ -104,5 +107,12 @@ contract TrustExchange is Strongbox {
         unlock(_task.requester, _task.salary + _task.requesterProofOfTrust);
         unlock(_task.worker, _task.workerProofOfTrust);
         _task.state = TaskState.CANCELED;
+    }
+
+    function rejectTask(bytes32 _taskAddr) public CurrentTask(_taskAddr, TaskState.DONE_BY_WORKER) {
+        require(tasks[_taskAddr].requester == msg.sender, "Sender is not requester of the task");
+        Task storage task = tasks[_taskAddr];
+        task.state = TaskState.REJECTED;
+        emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 }

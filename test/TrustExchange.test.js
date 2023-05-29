@@ -127,5 +127,39 @@ contract("TrustExchange", (accounts) => {
 
     })
 
+    it("Should be able to reject and done state of the task", async () => {
+        await contractInstance.deposit({from: requester, value: 10e18});
+        await contractInstance.deposit({from: worker, value: 10e18});
+        const taskCreationResult = await contractInstance.createTask(
+            5e18.toFixed(), // Salary
+            3e18.toFixed(), // Requester proof of trust,
+            3e18.toFixed(),  // Requester proof of trust for worker
+            {from: requester}
+        );
+        let taskAddress = taskCreationResult.logs[0].args.taskAddr;
+        await contractInstance.acceptTask(
+            taskAddress,
+            3e18.toFixed(),
+            {from: worker}
+        );
+        await contractInstance.doneTask(
+            taskAddress,
+            {from: worker}
+        );
+
+        const taskRejectResult = await contractInstance.rejectTask(
+            taskAddress,
+            {from: requester}
+        );
+        assert.equal(taskRejectResult.logs[0].args.newState, 5); // Task reject 
+
+        const taskRejectToDoneResult = await contractInstance.doneTask(
+            taskAddress, 
+            {from: worker}
+        );
+        assert.equal(taskRejectToDoneResult.logs[0].args.newState, 2); // Task done
+
+    });
+
 
 })
