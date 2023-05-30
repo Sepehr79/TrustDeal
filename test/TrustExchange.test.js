@@ -191,7 +191,7 @@ contract("TrustExchange", (accounts) => {
         let requesterFunds = await contractInstance.ownerToFunds(requester);
         let workerFunds = await contractInstance.ownerToFunds(worker);
         assert.equal(parseInt(requesterFunds.locked), 0);
-        assert.equal(parseInt(requesterFunds.actual) / 1e18.toFixed(), 3.8)
+        assert.equal(parseInt(requesterFunds.actual) / 1e18.toFixed(), 3.8);
         assert.equal(parseInt(workerFunds.locked), 0);
         assert.equal(parseInt(workerFunds.actual) / 1e18.toFixed(), 3.8);
 
