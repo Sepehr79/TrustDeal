@@ -10,7 +10,6 @@ contract TrustExchange is Strongbox {
 
     enum TaskState {
         CREATED_BY_REQUESTER,
-        ACCEPTED_BY_WORKER,
         DONE_BY_WORKER,
         FINISH_BY_REQUESTER,
         CANCELED,
@@ -57,13 +56,13 @@ contract TrustExchange is Strongbox {
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function acceptTask(bytes32 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.CREATED_BY_REQUESTER) {
+    function doneTaskWithTrust(bytes32 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.CREATED_BY_REQUESTER) {
         require(tasks[_taskAddr].requester != address(0x0));
         require(tasks[_taskAddr].requesterMinimumTrustValueForWorker <= _workerProofOfTrust);
         lock(msg.sender, _workerProofOfTrust);
 
         Task storage task = tasks[_taskAddr];
-        task.state = TaskState.ACCEPTED_BY_WORKER;
+        task.state = TaskState.DONE_BY_WORKER;
         task.worker = msg.sender;
         task.workerProofOfTrust = _workerProofOfTrust;
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
@@ -71,7 +70,7 @@ contract TrustExchange is Strongbox {
 
     function doneTask(bytes32 _taskAddr) public {
         require(tasks[_taskAddr].worker == msg.sender, "Sender is not worker of the task");
-        require(tasks[_taskAddr].state == TaskState.ACCEPTED_BY_WORKER || tasks[_taskAddr].state == TaskState.REJECTED, "Task is not at the correct state");
+        require(tasks[_taskAddr].state == TaskState.REJECTED, "Task is not at the correct state");
         tasks[_taskAddr].state = TaskState.DONE_BY_WORKER;
         emit TaskStateChanged(msg.sender, _taskAddr, tasks[_taskAddr].state);
     }
@@ -91,13 +90,13 @@ contract TrustExchange is Strongbox {
         Task storage task = tasks[_taskAddr];
         if (task.state == TaskState.CREATED_BY_REQUESTER) {
             require(msg.sender == task.requester, "Task doesnt exists with the requested address");    
-        } else if (task.state == TaskState.ACCEPTED_BY_WORKER) {
-            require(msg.sender == task.requester || msg.sender == task.worker, "Sender doesnt have premission to cancel this task");
         } else if (task.state == TaskState.DONE_BY_WORKER) {
             require(msg.sender == task.worker, "Sender doesnt have premission to cancel this task");
         }
         
-        if (task.state != TaskState.FINISH_BY_REQUESTER && task.state != TaskState.CANCELED) {
+        if (task.state != TaskState.FINISH_BY_REQUESTER && 
+            task.state != TaskState.CANCELED &&
+            task.state != TaskState.UNFINISHED) {
             _cancelTask(task);
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
         }
