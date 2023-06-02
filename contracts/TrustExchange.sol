@@ -50,7 +50,7 @@ contract TrustExchange is Strongbox {
             task.salary = _salary;
             task.requesterProofOfTrust = _requesterProofOfTrust;
             task.requesterMinimumTrustValueForWorker = _requesterMinimumTrustValueForWorker;
-            task.taskAddr = keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, block.timestamp));
+            task.taskAddr = keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, msg.sender, block.timestamp));
 
             tasks[task.taskAddr] = task;
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
