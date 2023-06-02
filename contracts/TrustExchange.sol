@@ -6,7 +6,7 @@ import "./Strongbox.sol";
 
 contract TrustExchange is Strongbox {
 
-    event TaskStateChanged(address indexed sender, bytes32 indexed taskAddr, TaskState newState);
+    event TaskStateChanged(address indexed sender, uint indexed taskAddr, TaskState newState);
 
     enum TaskState {
         CREATED_BY_REQUESTER,
@@ -18,7 +18,7 @@ contract TrustExchange is Strongbox {
     }
 
     struct Task {
-        bytes32 taskAddr;
+        uint taskAddr;
         TaskState state;
 
         address requester;
@@ -30,12 +30,12 @@ contract TrustExchange is Strongbox {
         uint workerProofOfTrust;       
     }
 
-    modifier CurrentTask(bytes32 taskAddr, TaskState state) {
+    modifier CurrentTask(uint taskAddr, TaskState state) {
         require(tasks[taskAddr].state == state, "Task is not at the correct state for this process");
         _;
     }
 
-    mapping (bytes32 => Task) public tasks;
+    mapping (uint => Task) public tasks;
 
     function createTask(
         uint _salary,
@@ -50,13 +50,13 @@ contract TrustExchange is Strongbox {
             task.salary = _salary;
             task.requesterProofOfTrust = _requesterProofOfTrust;
             task.requesterMinimumTrustValueForWorker = _requesterMinimumTrustValueForWorker;
-            task.taskAddr = keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, msg.sender, block.timestamp));
+            task.taskAddr = uint(keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, msg.sender, block.timestamp)));
 
             tasks[task.taskAddr] = task;
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function doneTaskWithTrust(bytes32 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.CREATED_BY_REQUESTER) {
+    function doneTaskWithTrust(uint256 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.CREATED_BY_REQUESTER) {
         require(tasks[_taskAddr].requester != address(0x0));
         require(tasks[_taskAddr].requesterMinimumTrustValueForWorker <= _workerProofOfTrust);
         lock(msg.sender, _workerProofOfTrust);
@@ -68,14 +68,14 @@ contract TrustExchange is Strongbox {
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function doneTask(bytes32 _taskAddr) public {
+    function doneTask(uint256 _taskAddr) public {
         require(tasks[_taskAddr].worker == msg.sender, "Sender is not worker of the task");
         require(tasks[_taskAddr].state == TaskState.REJECTED, "Task is not at the correct state");
         tasks[_taskAddr].state = TaskState.DONE_BY_WORKER;
         emit TaskStateChanged(msg.sender, _taskAddr, tasks[_taskAddr].state);
     }
 
-    function finishTask(bytes32 _taskAddr) public CurrentTask(_taskAddr, TaskState.DONE_BY_WORKER) {
+    function finishTask(uint256 _taskAddr) public CurrentTask(_taskAddr, TaskState.DONE_BY_WORKER) {
         require(tasks[_taskAddr].requester == msg.sender, "Sender is not requester of the task");
 
         Task storage task = tasks[_taskAddr];
@@ -86,7 +86,7 @@ contract TrustExchange is Strongbox {
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function cancelTask(bytes32 _taskAddr) public {
+    function cancelTask(uint256 _taskAddr) public {
         Task storage task = tasks[_taskAddr];
         if (task.state == TaskState.CREATED_BY_REQUESTER) {
             require(msg.sender == task.requester, "Task doesnt exists with the requested address");    
@@ -108,14 +108,14 @@ contract TrustExchange is Strongbox {
         _task.state = TaskState.CANCELED;
     }
 
-    function rejectTask(bytes32 _taskAddr) public CurrentTask(_taskAddr, TaskState.DONE_BY_WORKER) {
+    function rejectTask(uint256 _taskAddr) public CurrentTask(_taskAddr, TaskState.DONE_BY_WORKER) {
         require(tasks[_taskAddr].requester == msg.sender, "Sender is not requester of the task");
         Task storage task = tasks[_taskAddr];
         task.state = TaskState.REJECTED;
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function unFinishTask(bytes32 _taskAddr) public {
+    function unFinishTask(uint256 _taskAddr) public {
         Task storage task = tasks[_taskAddr];
         require(task.state == TaskState.REJECTED || task.state == TaskState.DONE_BY_WORKER, "Task is not at correct state");
         require(task.requester == msg.sender || task.worker == msg.sender, "Caller has not premission to finish this task");
