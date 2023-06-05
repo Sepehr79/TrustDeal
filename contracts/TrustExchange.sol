@@ -90,13 +90,10 @@ contract TrustExchange is Strongbox {
         Task storage task = tasks[_taskAddr];
         if (task.state == TaskState.CREATED_BY_REQUESTER) {
             require(msg.sender == task.requester, "Task doesnt exists with the requested address");    
-        }
-        
-        if (task.state != TaskState.FINISH_BY_REQUESTER && 
-            task.state != TaskState.CANCELED &&
-            task.state != TaskState.UNFINISHED) {
             _cancelTask(task);
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
+        } else {
+            revert("Task is not at the state CREATED");
         }
     }
 
