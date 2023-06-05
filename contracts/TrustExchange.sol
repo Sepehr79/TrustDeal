@@ -98,7 +98,7 @@ contract TrustExchange is Strongbox {
     }
 
     function _cancelTask(Task storage _task) private {
-        unlock(_task.requester, _task.salary + _task.requesterProofOfTrust);
+        unlock(_task.requester, _task.salary + ((_task.requesterProofOfTrust * 8) / 10));
         _task.state = TaskState.CANCELED;
     }
 

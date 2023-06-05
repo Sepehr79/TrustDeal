@@ -73,20 +73,20 @@ contract("TrustExchange", (accounts) => {
     it("Should refund the amount of funds locked from the seller or customer when canceling", async () => {
 
         // Deposit fund
-        await contractInstance.deposit({from: requester, value: 5e18})
+        await contractInstance.deposit({from: requester, value: 40e18})
 
         // Create new task
         const taskCreationResult = await contractInstance.createTask(
-            2e18.toFixed(), // Salary
-            2e18.toFixed(), // Requester proof of trust
+            20e18.toFixed(), // Salary
+            10e18.toFixed(), // Requester proof of trust
             2e18.toFixed(),  
             {from: requester}
         )
 
         // Lock funds
         let lockedFund = await contractInstance.ownerToFunds(requester);
-        assert.equal(parseInt(lockedFund.actual), 1e18);  
-        assert.equal(parseInt(lockedFund.locked), 4e18); // Locked funds
+        assert.equal(parseInt(lockedFund.actual), 10e18);  
+        assert.equal(parseInt(lockedFund.locked), 30e18); // Locked funds
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
 
         // Cancel task
@@ -95,7 +95,7 @@ contract("TrustExchange", (accounts) => {
 
         // Unlock funds
         let unlockedFund = await contractInstance.ownerToFunds(requester);
-        assert.equal(parseInt(unlockedFund.actual), 5e18); 
+        assert.equal(parseInt(unlockedFund.actual), 38e18); 
 
     })
 
