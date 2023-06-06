@@ -54,7 +54,7 @@ contract TrustExchange is Strongbox {
         uint _salary,
         uint _requesterProofOfTrust,
         uint _requesterMinimumTrustValueForWorker,
-        address _worker
+        address _dealer
         ) public {
             lock(msg.sender, _salary + _requesterProofOfTrust);
 
@@ -67,7 +67,7 @@ contract TrustExchange is Strongbox {
             task.taskAddr = uint(keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, msg.sender, block.timestamp)));
 
             tasks[task.taskAddr] = task;
-            taskNft.mint(_worker, task.taskAddr);
+            taskNft.mint(_dealer, task.taskAddr);
             
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }

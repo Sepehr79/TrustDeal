@@ -1,12 +1,17 @@
-const trustExchange = artifacts.require("./TrustExchange")
+const TrustExchange = artifacts.require("./TrustExchange")
+const TaskNFT = artifacts.require("./TaskNFT")
 
 contract("TrustExchange", (accounts) => {
-    let [worker, requester, others] = accounts
+    let [worker, dealer, requester, anonymous] = accounts
     let contractInstance;
+    let taskNftContractInstance;
 
     beforeEach(async () => {
         // Deploy contract to the test enviroment (ganache)
-        contractInstance = await trustExchange.new()
+        contractInstance = await TrustExchange.new();
+        let TaskNftAddress = await contractInstance.NFTaddress();
+
+        taskNftContractInstance = new TaskNFT(TaskNftAddress);
     })
 
     it("Should work correctly with worker and requester", async () => {
@@ -20,7 +25,7 @@ contract("TrustExchange", (accounts) => {
             5e18.toFixed(), // Salary
             3e18.toFixed(), // Requester proof of trust,
             3e18.toFixed(),  // Requester proof of trust for worker
-            worker,
+            dealer,
             {from: requester}
         )
 
@@ -33,6 +38,9 @@ contract("TrustExchange", (accounts) => {
 
         let taskAddress = taskCreationResult.logs[0].args.taskAddr; // get address of the task
         console.log(`Task address: ${taskAddress}`) 
+
+        // dealer transfers task nft to the worker
+        await taskNftContractInstance.safeTransferFrom(dealer, worker, taskAddress, {from: dealer});
 
         const taskAcceptionResult = await contractInstance.doneTaskWithTrust(
             taskAddress,
@@ -200,7 +208,7 @@ contract("TrustExchange", (accounts) => {
             await contractInstance.doneTaskWithTrust(
                 taskAddress,
                 10e18.toFixed(),
-                {from: others}
+                {from: anonymous}
             );
             assert.fail();
         } catch (e) {
