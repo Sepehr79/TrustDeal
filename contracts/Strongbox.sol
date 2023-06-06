@@ -4,8 +4,6 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Strongbox {
 
-    address private burnAddress = 0x0000000000000000000000000000000000000000;
-
     struct Fund {
         uint actual;
         uint locked;
@@ -45,7 +43,7 @@ contract Strongbox {
 
     function burn(address _owner, uint _amount) internal {
         require(ownerToFunds[_owner].locked >= _amount, "Amount is bigger than locked funds for this owner");
-        (bool sent,) = burnAddress.call{value: _amount}("");
+        (bool sent,) = address(0).call{value: _amount}("");
         if(sent) {
             ownerToFunds[_owner].locked -= _amount;
         } else {
