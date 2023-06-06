@@ -1,7 +1,7 @@
 const trustExchange = artifacts.require("./TrustExchange")
 
 contract("TrustExchange", (accounts) => {
-    let [worker, requester] = accounts
+    let [worker, requester, others] = accounts
     let contractInstance;
 
     beforeEach(async () => {
@@ -20,6 +20,7 @@ contract("TrustExchange", (accounts) => {
             5e18.toFixed(), // Salary
             3e18.toFixed(), // Requester proof of trust,
             3e18.toFixed(),  // Requester proof of trust for worker
+            worker,
             {from: requester}
         )
 
@@ -80,6 +81,7 @@ contract("TrustExchange", (accounts) => {
             2e18.toFixed(), // Salary
             2e18.toFixed(), // Requester proof of trust
             2e18.toFixed(),  
+            worker,
             {from: requester}
         )
 
@@ -107,6 +109,7 @@ contract("TrustExchange", (accounts) => {
                 2e18.toFixed(), // Salary
                 3e18.toFixed(), // Requester proof of trust 
                 2e18.toFixed(),  
+                worker,
                 {from: requester}
             ) // 2 + 3 ethers is higher than 4 funds
             assert.fail()
@@ -125,6 +128,7 @@ contract("TrustExchange", (accounts) => {
             5e18.toFixed(), // Salary
             3e18.toFixed(), // Requester proof of trust,
             3e18.toFixed(),  // Requester proof of trust for worker
+            worker,
             {from: requester}
         );
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
@@ -155,6 +159,7 @@ contract("TrustExchange", (accounts) => {
             5e18.toFixed(), // Salary
             5e18.toFixed(), // Requester proof of trust,
             10e18.toFixed(),  // Requester proof of trust for worker
+            worker,
             {from: requester}
         );
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
@@ -180,5 +185,28 @@ contract("TrustExchange", (accounts) => {
 
     });
 
+    it("Should reject acception of task if the worker doesnt have task address nft", async () => {
+        await contractInstance.deposit({from: requester, value: 10e18});
+        await contractInstance.deposit({from: worker, value: 10e18});
+        const taskCreationResult = await contractInstance.createTask(
+            5e18.toFixed(), // Salary
+            5e18.toFixed(), // Requester proof of trust,
+            10e18.toFixed(),  // Requester proof of trust for worker
+            worker,
+            {from: requester}
+        );
+        let taskAddress = taskCreationResult.logs[0].args.taskAddr;
+        try {
+            await contractInstance.doneTaskWithTrust(
+                taskAddress,
+                10e18.toFixed(),
+                {from: others}
+            );
+            assert.fail();
+        } catch (e) {
+            console.log(e)
+        }
+        
+    })
 
 })

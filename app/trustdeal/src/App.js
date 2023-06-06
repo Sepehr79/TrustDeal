@@ -17,7 +17,7 @@ const sdk = new MetaMaskSDK(options);
 const provider = sdk.getProvider()
 let web3js = new Web3(provider)
 const contractABI = require('./TrustExchange.json').abi
-const contractAddress = '0xce56F94344D4A28B90B77D1Fc070A1CCD0247b85'
+const contractAddress = '0x27A7A63134c8E7659089d652D228956De2a154F7'
 
 
 function App() {
@@ -43,7 +43,7 @@ function App() {
         <div className='container-fluid text-center'>
           <BrowserRouter>
               <Routes>
-                <Route path='/' element={<Home />} />
+                <Route path='/' element={<Home contractInstance={contractInstance} />} />
                 <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
                 <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
                 <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />

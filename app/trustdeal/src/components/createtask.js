@@ -15,7 +15,8 @@ const CreateTask = ({ contractInstance, account }) => {
                             contractInstance.methods.createTask(
                                 (event.target.salary.value * 1e18).toFixed(),
                                 (event.target.proofOfTrust.value * 1e18).toFixed(),
-                                (event.target.workerProofOfTrust.value * 1e18).toFixed()
+                                (event.target.workerProofOfTrust.value * 1e18).toFixed(),
+                                (event.target.worker.value)
                             ).send({ from: account })
                             .on("receipt", function(receipt) {
                                 setTaskAddr(receipt.events.TaskStateChanged.returnValues.taskAddr)
@@ -46,6 +47,7 @@ const CreateTask = ({ contractInstance, account }) => {
                             
                             <input type='text' className="m-1 w-25" id='header' name='header' placeholder="Task header" /><br />
                             <textarea name='description' className="m-1 w-25" placeholder="Task description" /><br />
+                            <input type='text' className="m-1 w-25" id='worker' name='worker' placeholder="Worker address" /><br />
                             <input type='number' className="m-1 w-25" step='any' name='salary' placeholder="Salary" /><br />
                             <input type='number' className="m-1 w-25" step='any' name='proofOfTrust' placeholder="Proof of trust" /><br />
                             <input type='number' className="m-1 w-25" step='any' name='workerProofOfTrust' placeholder="Worker proof of trust" /><br /> 
