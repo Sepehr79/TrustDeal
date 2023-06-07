@@ -4,6 +4,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 import "./Strongbox.sol";
 import "./TaskNFT.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract TrustExchange is Strongbox {
 
@@ -46,6 +47,10 @@ contract TrustExchange is Strongbox {
 
     mapping (uint => Task) public tasks;
 
+    using Counters for Counters.Counter;
+    Counters.Counter private _taskIds;
+
+
     function NFTaddress() public view returns (address) {
         return address(taskNft);
     }
@@ -64,7 +69,9 @@ contract TrustExchange is Strongbox {
             task.salary = _salary;
             task.requesterProofOfTrust = _requesterProofOfTrust;
             task.requesterMinimumTrustValueForWorker = _requesterMinimumTrustValueForWorker;
-            task.taskAddr = uint(keccak256(abi.encodePacked(_salary, _requesterProofOfTrust, _requesterMinimumTrustValueForWorker, msg.sender, block.timestamp)));
+
+            task.taskAddr = _taskIds.current();
+            _taskIds.increment();
 
             tasks[task.taskAddr] = task;
             taskNft.mint(_dealer, task.taskAddr);
