@@ -22,3 +22,29 @@ To increase reliability in exchanges, we have used a mechanism called <ins>proof
 4. If for any reason there is a dispute between the two parties that could not be resolved, then one of the parties can change the status of the task to Unfinish, and in this case, while deducting a certain amount of loss according to an implemented algorithm, the locked amounts will be credited to the account of the parties.
 
 This smart contract is designed to support different client-server construction models. in this case, non-important data is stored on the server side and important data (such as each person's money) is stored in the blockchain. The client can interact with the server and the blockchain at the same time. simple implementations of client and server model are stored in app and server directory. server is used to save non-important data of the task such as header and description.
+
+## How to use?
+
+1. Clone the project
+    
+        git clone https://github.com/Sepehr79/TrustDeal.git
+
+2. Install and start ganache local blockchain as test blockchain
+
+3. Intstall truffle
+
+4. On the root directory type
+
+        truffle migrate --network ganache
+
+5. Open truffle desktop and copy the address of the TrustExchange smart contract to the contractAddress variable of ./app/trustdeal/src/App.js
+
+6. Start the server on ./server/trustdeal using 
+
+        ./mvnw spring-boot: run
+
+7. Start the client on ./app/trustdeal using 
+
+
+        npm start
+    
