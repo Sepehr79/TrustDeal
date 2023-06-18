@@ -124,7 +124,7 @@ function task_state_create(task, contractInstance, account, submitClick) {
                         </td>
                 </tr>
                 <tr>
-                    <td>Done task</td>
+                    <td>Do task</td>
                     <td>
                         <form onSubmit={(event) => {
                                     event.preventDefault()
@@ -137,12 +137,12 @@ function task_state_create(task, contractInstance, account, submitClick) {
                                     })
                                 }}>
                                     <input type='number' name='proofOfTrust' step='any' placeholder='Prove your trust!' />
-                                    <input type='submit' value='Done task' />
+                                    <input type='submit' value='Do task' />
                                 </form>
                     </td>
                 </tr>
                 <tr>
-                <td>Cancel task</td>
+                <td>Remove task</td>
                 <td>
                     <button onClick={event => {
                                     contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
@@ -150,7 +150,7 @@ function task_state_create(task, contractInstance, account, submitClick) {
                                         alert("Task canceled")
                                         submitClick()
                                     })
-                    }}>Cancel</button>
+                    }}>Remove</button>
                 </td>
                 </tr>
             </table>
@@ -249,7 +249,7 @@ function task_state_done(task, contractInstance, account, submitClick) {
                             }}>Reject</button>
                         </td>
                     </tr>
-                    <tr>
+                    {/* <tr>
                         <td>
                             Cancel task
                         </td>
@@ -262,9 +262,9 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                         })
                         }}>Cancel</button>
                         </td>
-                    </tr>
+                    </tr> */}
                     <tr>
-                        <td>Unfinish task</td>
+                        <td>Reassign task</td>
                         <td>
                         <button onClick={event => {
                                             contractInstance.methods.unFinishTask(task.taskAddr).send({ from: account })
@@ -272,7 +272,7 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                                 alert("Task unfinished")
                                                 submitClick()
                                             })
-                            }}>Unfinish</button>
+                            }}>Reassign</button>
                         </td>
                     </tr>
             </table>
