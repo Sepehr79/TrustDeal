@@ -1,10 +1,9 @@
 const TaskState = {
-    "0": "Created",
-    "1": "Done",
+    "0": "Unassigned",
+    "1": "Verify",
     "2": "Finished",
-    "3": "Canceled",
-    "4": "Rejected",
-    "5": "Unfinished"
+    "3": "Removed",
+    "4": "Rejected"
 }
 
 function task_state_create(task, contractInstance, account, submitClick) {
@@ -40,24 +39,89 @@ function task_state_create(task, contractInstance, account, submitClick) {
                     </td>
                 </tr>
                 <tr>
+                <td>Worker</td>
+                        <td>
+                            <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.setDealer(event.target.worker.value, task.taskAddr)
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task worker updated")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='text' name="worker" id="worker" defaultValue={ task.worker } />
+                                <input disabled={task.requester != account} type='submit' value='Update worker' />
+                            </form>
+                        </td>
+                </tr>
+                <tr>
                     <td>
                         Salary
                     </td>
                     <td>
-                        { task.salary / 1e18 } Eth
-                    </td>
+                            <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.setSalary(
+                                            task.taskAddr,
+                                            (event.target.salary.value * 1e18).toFixed()
+                                        )
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task salary updated")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='number' step='any' name="salary" id="salary" defaultValue={ task.salary / 1e18 } />
+                                <input type='submit' disabled={task.requester != account} value='Update salary' />
+                            </form>
+                        </td>
                 </tr>
                 <tr>
                 <td>Proof of trust</td>
-                    <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                <td>
+                            <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.setProofOfTrust(
+                                            task.taskAddr,
+                                            (event.target.requesterProofOfTrust.value * 1e18).toFixed()
+                                        )
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task requesterProofOfTrust updated")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='number' step='any' name="requesterProofOfTrust" id="requesterProofOfTrust" defaultValue={ task.requesterProofOfTrust / 1e18 } />
+                                <input type='submit' disabled={task.requester != account} value='Update requesterProofOfTrust' />
+                            </form>
+                        </td>
                 </tr>
                 <tr>
                     <td>
                         Minimum proof of trust for worker
                     </td>
                     <td>
-                        { task.requesterMinimumTrustValueForWorker / 1e18 } Eth
-                    </td>
+                            <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.setMinimumTrustForWorker(
+                                            task.taskAddr,
+                                            (event.target.workerProofOfTrust.value * 1e18).toFixed()
+                                        )
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task requesterProofOfTrust updated")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='number' step='any' name="workerProofOfTrust" id="workerProofOfTrust" defaultValue={ task.requesterMinimumTrustValueForWorker / 1e18 } />
+                                <input type='submit' disabled={task.requester != account} value='Update workerProofOfTrust' />
+                            </form>
+                        </td>
                 </tr>
                 <tr>
                     <td>Done task</td>
@@ -128,26 +192,30 @@ function task_state_done(task, contractInstance, account, submitClick) {
                     </tr>
                     <tr>
                         <td>Worker</td>
-                        <td>{ task.worker }</td>
+                        <td>
+                        { task.worker }
+                        </td>
                     </tr>
                     <tr>
                         <td>
                             Salary
                         </td>
                         <td>
-                            { task.salary / 1e18 } Eth
+                        { task.salary / 1e18 }
                         </td>
                     </tr>
                     <tr>
                         <td>Proof of trust</td>
-                        <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
+                        <td>
+                        { task.requesterProofOfTrust / 1e18 }
+                        </td>
                     </tr>
                     <tr>
                         <td>
-                        Worker proof of trust
+                            Worker proof of trust
                         </td>
                         <td>
-                            { task.workerProofOfTrust / 1e18 } Eth
+                        { task.workerProofOfTrust / 1e18 }
                         </td>
                     </tr>
                     <tr>
@@ -426,66 +494,6 @@ function task_state_rejected(task, contractInstance, account, submitClick) {
     )
 }
 
-function task_state_unfinished(task) {
-    return (
-        <div>
-            <table className="table table-bordered text-center">
-            <tr>
-                    <td>Header</td>
-                    <td>{ task.header }</td>
-                </tr>
-                <tr>
-                    <td>
-                        Description
-                    </td>
-                    <td>
-                        { task.description }
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        State
-                    </td>
-                    <td>
-                        { TaskState[task.state] }
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Requester
-                    </td>
-                    <td>
-                        { task.requester }
-                    </td>
-                </tr>
-                <tr>
-                    <td>Worker</td>
-                    <td>{ task.worker }</td>
-                </tr>
-                <tr>
-                    <td>
-                        Salary
-                    </td>
-                    <td>
-                        { task.salary / 1e18 } Eth
-                    </td>
-                </tr>
-                <tr>
-                    <td>Proof of trust</td>
-                    <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                </tr>
-                <tr>
-                    <td>
-                       Worker proof of trust
-                    </td>
-                    <td>
-                        { task.workerProofOfTrust / 1e18 } Eth
-                    </td>
-                </tr>
-            </table>
-        </div> 
-    )
-}
 
 const TaskTable = ({ task, contractInstance, account, submitClick }) => {
 
@@ -496,7 +504,6 @@ const TaskTable = ({ task, contractInstance, account, submitClick }) => {
         case "2": return task_state_finish(task)
         case "3": return task_state_cancel(task)
         case "4": return task_state_rejected(task, contractInstance, account, submitClick)
-        case "5": return task_state_unfinished(task)
         default: return ( "" ) 
     }
     

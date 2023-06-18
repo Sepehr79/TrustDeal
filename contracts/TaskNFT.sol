@@ -21,5 +21,9 @@ contract TaskNFT is ERC721, Ownable {
         _burn(tokenId);
     }
 
+    function approveTask(address to, uint256 tokenId) public onlyOwner {
+        _approve(to, tokenId);
+    }
+
 }
 

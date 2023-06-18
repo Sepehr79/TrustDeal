@@ -17,7 +17,7 @@ const sdk = new MetaMaskSDK(options);
 const provider = sdk.getProvider()
 let web3js = new Web3(provider)
 const contractABI = require('./TrustExchange.json').abi
-const contractAddress = '0x90743369f9d156bCcAD4e2C1b30ea485393E511D'
+const contractAddress = '0xf83056958f1aD7CADDd0277d749425640c6b038C'
 
 
 function App() {
