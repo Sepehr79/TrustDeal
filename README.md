@@ -11,7 +11,7 @@ Users are divided into two general categories: worker and requester. here is the
 
 To increase reliability in exchanges, we have used a mechanism called <ins>proof of trust</ins>. both requester and worker lock an amount as a proof of trust in the smart contract and it is not returned to either party until the consent of both parties is obtained. most important entity is called <ins>Task</ins> which is considered as an NFT and it can have multiple states and is shown below:
 
-![state change](./etc/img/stateGraph3.jpg)
+![state change](./analytics/stateGraph10.jpg)
 
 1. Requester creates the task with salary and his proof of trust amount. also requester can specify the minimum value as proof of trust of the worker. the created task is then assigned to a dealer that can be the worker or someone else. this dealer is also specified by the requester.
 
