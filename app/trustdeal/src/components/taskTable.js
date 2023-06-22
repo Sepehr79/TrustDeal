@@ -232,6 +232,27 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                             submitClick()
                                             console.log(result)
                                         })
+                                        .then(result => {
+                                            fetch("http://localhost:8080/taskReviews",
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify(
+                                                    {
+                                                        
+                                                        "userAddress": task.worker,
+                                                        "taskAddress": task.taskAddr,
+                                                        "taskState": "FINISHED"
+
+                                                    })
+                                            })
+                                            .then(response => { response.json() })
+                                            .then(result => {
+                                                console.log(`POST request sent with account ${account}`)
+                                            })
+                                        })
                                     }}>
                                 <input type='submit' value='Finish task' />
                             </form>
@@ -271,6 +292,23 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                             .then(result => {
                                                 alert("Task unfinished")
                                                 submitClick()
+                                            }).then(result => {
+                                                fetch("http://localhost:8080/taskReviews",
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                    },
+                                                    body: JSON.stringify(
+                                                        {
+                                                            
+                                                            "userAddress": task.worker,
+                                                            "taskAddress": task.taskAddr,
+                                                            "taskState": "REASSIGNED"
+    
+                                                        })
+                                                })
+                                                .then(response => { response.json() })
                                             })
                             }}>Reassign</button>
                         </td>
@@ -478,13 +516,30 @@ function task_state_rejected(task, contractInstance, account, submitClick) {
                     </td>
                 </tr>
                 <tr>
-                    <td>Unfinish task</td>
+                    <td>Reassign task</td>
                     <td>
                     <button onClick={event => {
                                             contractInstance.methods.unFinishTask(task.taskAddr).send({ from: account })
                                             .then(result => {
                                                 alert("Task unfinished")
                                                 submitClick()
+                                            }).then(result => {
+                                                fetch("http://localhost:8080/taskReviews",
+                                                {
+                                                    method: "POST",
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                    },
+                                                    body: JSON.stringify(
+                                                        {
+                                                            
+                                                            "userAddress": task.worker,
+                                                            "taskAddress": task.taskAddr,
+                                                            "taskState": "REASSIGNED"
+    
+                                                        })
+                                                })
+                                                .then(response => { response.json() })
                                             })
                             }}>Unfinish</button>
                     </td>

@@ -7,6 +7,7 @@ import Home from './components/home';
 import CreateTask from './components/createtask';
 import ManageTask from './components/manageTask';
 import 'bootstrap/dist/css/bootstrap.css';
+import Workers from './components/Workers';
 
 
 const options = {
@@ -17,7 +18,7 @@ const sdk = new MetaMaskSDK(options);
 const provider = sdk.getProvider()
 let web3js = new Web3(provider)
 const contractABI = require('./TrustExchange.json').abi
-const contractAddress = '0xf83056958f1aD7CADDd0277d749425640c6b038C'
+const contractAddress = '0x215302dbC8d54AeA21C6a8cD746372340A825D46'
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
                 <Route path='/funds' element={<FundsManagement contractInstance={contractInstance} account={account} />} />
                 <Route path='/createTask' element={<CreateTask contractInstance={contractInstance} account={account} />} />
                 <Route path='/manageTask' element={<ManageTask contractInstance={contractInstance} account={account} />} />
+                <Route path='/workers' element={<Workers account={account} /> } />
               </Routes>
             </BrowserRouter>
           </div>
