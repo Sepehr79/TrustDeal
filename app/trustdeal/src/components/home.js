@@ -20,7 +20,7 @@ const Home = ( { contractInstance }) => {
         <div>
             
             <h3>Home</h3><br />
-            <p>NFT address: { address }</p>
+            {/* <p>NFT address: { address }</p> */}
             <button className="btn btn-primary w-25 m-1">
                 <Link className="text-white text-decoration-none h6" to='/funds'>Deposit & Withdraw Funds</Link>
             </button><br></br>

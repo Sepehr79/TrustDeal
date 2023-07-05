@@ -3,27 +3,22 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./Strongbox.sol";
-import "./TaskNFT.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract TrustExchange is Strongbox {
 
-    address private owner;
-    TaskNFT private taskNft;
-
     constructor() {
-        owner = msg.sender;
-        taskNft = new TaskNFT();
+        
     }
 
     event TaskStateChanged(address indexed sender, uint indexed taskAddr, TaskState newState);
 
     enum TaskState {
         UNASSIGNED_TASK,
+        ASSIGNED_TASK,
         VERIFY_TASK,
         FINISHED_TASK,
-        REMOVED_TASK,
-        REJECTED_TASK   
+        REMOVED_TASK   
     }
 
     struct Task {
@@ -50,15 +45,10 @@ contract TrustExchange is Strongbox {
     Counters.Counter private _taskIds;
 
 
-    function NFTaddress() public view returns (address) {
-        return address(taskNft);
-    }
-
     function setDealer(address _to, uint256 _taskAddr) public CurrentTask(_taskAddr, TaskState.UNASSIGNED_TASK) {
         Task storage task = tasks[_taskAddr];
         require(msg.sender == task.requester);
         task.worker = _to;
-        taskNft.approveTask(_to, _taskAddr);
     }
 
     function setSalary(uint _taskAddr, uint _salary) public CurrentTask(_taskAddr, TaskState.UNASSIGNED_TASK) {
@@ -111,29 +101,27 @@ contract TrustExchange is Strongbox {
             _taskIds.increment();
 
             tasks[task.taskAddr] = task;
-            taskNft.mint(msg.sender, task.taskAddr);
-            taskNft.approveTask(_dealer, task.taskAddr);
             
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function doneTaskWithTrust(uint256 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.UNASSIGNED_TASK) {
+    function acceptTask(uint256 _taskAddr, uint _workerProofOfTrust) public CurrentTask(_taskAddr, TaskState.UNASSIGNED_TASK) {
         Task storage task = tasks[_taskAddr];
         require(task.requester != address(0x0));
         require(task.requesterMinimumTrustValueForWorker <= _workerProofOfTrust);
-        require(taskNft.isApprovedOrOwner(msg.sender, _taskAddr));
+        require(task.worker == msg.sender, "Sender is not worker of the task");
 
         lock(msg.sender, _workerProofOfTrust);
 
-        task.state = TaskState.VERIFY_TASK;
-        task.worker = msg.sender;
+        task.state = TaskState.ASSIGNED_TASK;
+
         task.workerProofOfTrust = _workerProofOfTrust;
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function doneTask(uint256 _taskAddr) public {
+    function doTask(uint256 _taskAddr) public {
         require(tasks[_taskAddr].worker == msg.sender, "Sender is not worker of the task");
-        require(tasks[_taskAddr].state == TaskState.REJECTED_TASK, "Task is not at the correct state");
+        require(tasks[_taskAddr].state == TaskState.ASSIGNED_TASK, "Task is not at the correct state");
         tasks[_taskAddr].state = TaskState.VERIFY_TASK;
         emit TaskStateChanged(msg.sender, _taskAddr, tasks[_taskAddr].state);
     }
@@ -146,37 +134,35 @@ contract TrustExchange is Strongbox {
         unlock(task.worker, task.workerProofOfTrust);
         transfer(task.requester, task.worker, task.salary);
         task.state = TaskState.FINISHED_TASK;
-        taskNft.burn(task.taskAddr);
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function cancelTask(uint256 _taskAddr) public {
+    function removeTask(uint256 _taskAddr) public {
         Task storage task = tasks[_taskAddr];
         if (task.state == TaskState.UNASSIGNED_TASK) {
             require(msg.sender == task.requester, "Task doesnt exists with the requested address");    
-            _cancelTask(task);
+            _removeTask(task);
             emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
         } else {
             revert("Task is not at the state UNASSIGNED_TASK");
         }
     }
 
-    function _cancelTask(Task storage _task) private {
+    function _removeTask(Task storage _task) private {
         unlock(_task.requester, _task.salary + _task.requesterProofOfTrust);
         _task.state = TaskState.REMOVED_TASK;
-        taskNft.burn(_task.taskAddr);
     }
 
     function rejectTask(uint256 _taskAddr) public CurrentTask(_taskAddr, TaskState.VERIFY_TASK) {
         require(tasks[_taskAddr].requester == msg.sender, "Sender is not requester of the task");
         Task storage task = tasks[_taskAddr];
-        task.state = TaskState.REJECTED_TASK;
+        task.state = TaskState.ASSIGNED_TASK;
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }
 
-    function unFinishTask(uint256 _taskAddr) public {
+    function cancelTask(uint256 _taskAddr) public {
         Task storage task = tasks[_taskAddr];
-        require(task.state == TaskState.REJECTED_TASK || task.state == TaskState.VERIFY_TASK, "Task is not at correct state");
+        require(task.state == TaskState.ASSIGNED_TASK || task.state == TaskState.VERIFY_TASK, "Task is not at correct state");
         require(task.requester == msg.sender || task.worker == msg.sender, "Caller has not premission to finish this task");
 
         uint repaymentRate = calcRepaymentRate(task);
@@ -198,7 +184,6 @@ contract TrustExchange is Strongbox {
         task.requesterProofOfTrust = 0;
         task.workerProofOfTrust = 0;
         task.salary = 0;
-        taskNft.approveTask(address(0), task.taskAddr);
 
         emit TaskStateChanged(msg.sender, task.taskAddr, task.state);
     }

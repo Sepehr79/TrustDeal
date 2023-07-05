@@ -1,17 +1,12 @@
 const TrustExchange = artifacts.require("./TrustExchange")
-const TaskNFT = artifacts.require("./TaskNFT")
 
 contract("TrustExchange", (accounts) => {
-    let [worker, dealer, requester, anonymous] = accounts
+    let [worker, requester, anonymous] = accounts
     let contractInstance;
-    let taskNftContractInstance;
 
     beforeEach(async () => {
         // Deploy contract to the test enviroment (ganache)
         contractInstance = await TrustExchange.new();
-        let TaskNftAddress = await contractInstance.NFTaddress();
-
-        taskNftContractInstance = new TaskNFT(TaskNftAddress);
     })
 
     it("Should work correctly with worker and requester", async () => {
@@ -25,7 +20,7 @@ contract("TrustExchange", (accounts) => {
             5e18.toFixed(), // Salary
             3e18.toFixed(), // Requester proof of trust,
             3e18.toFixed(),  // Requester proof of trust for worker
-            dealer,
+            worker,
             {from: requester}
         )
 
@@ -39,17 +34,19 @@ contract("TrustExchange", (accounts) => {
         let taskAddress = taskCreationResult.logs[0].args.taskAddr; // get address of the task
         console.log(`Task address: ${taskAddress}`) 
 
-        // dealer transfers task nft to the worker
-        await taskNftContractInstance.safeTransferFrom(requester, worker, taskAddress, {from: dealer});
-
-        const taskAcceptionResult = await contractInstance.doneTaskWithTrust(
+        const taskAcceptionResult = await contractInstance.acceptTask(
             taskAddress,
             3e18.toFixed(),
             {from: worker}
         ) 
 
         assert.equal(taskAcceptionResult.receipt.status, true);
-        assert.equal(taskAcceptionResult.logs[0].args.newState, 1); // Task new state is VERIFY_TASK
+        assert.equal(taskAcceptionResult.logs[0].args.newState, 1); // Task new state is ASSIGNED_TASK
+
+        const taskDoneResult = await contractInstance.doTask(taskAddress, {from: worker});
+
+        assert.equal(taskDoneResult.receipt.status, true);
+        assert.equal(taskDoneResult.logs[0].args.newState, 2); // Task new state is VERIFY_TASK
 
         const taskFinishResult = await contractInstance.finishTask(
             taskAddress,
@@ -57,7 +54,7 @@ contract("TrustExchange", (accounts) => {
         )
 
         assert.equal(taskFinishResult.receipt.status, true);
-        assert.equal(taskFinishResult.logs[0].args.newState, 2); // FINISHED_TASK
+        assert.equal(taskFinishResult.logs[0].args.newState, 3); // FINISHED_TASK
 
         
         const workerFunds = await contractInstance.ownerToFunds(worker);
@@ -100,8 +97,8 @@ contract("TrustExchange", (accounts) => {
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
 
         // Cancel task
-        let taskCancelResult = await contractInstance.cancelTask(taskAddress, {from: requester}); // Remove the task
-        assert.equal(taskCancelResult.logs[0].args.newState, 3); // Task state is REMOVED_TASK
+        let taskCancelResult = await contractInstance.removeTask(taskAddress, {from: requester}); // Remove the task
+        assert.equal(taskCancelResult.logs[0].args.newState, 4); // Task state is REMOVED_TASK
 
         // Unlock funds
         let unlockedFund = await contractInstance.ownerToFunds(requester);
@@ -140,23 +137,28 @@ contract("TrustExchange", (accounts) => {
             {from: requester}
         );
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
-        await contractInstance.doneTaskWithTrust(
+        await contractInstance.acceptTask(
             taskAddress,
             3e18.toFixed(),
             {from: worker}
         );
 
+        await contractInstance.doTask(
+            taskAddress,
+            {from: worker}
+        ) 
+
         const taskRejectResult = await contractInstance.rejectTask(
             taskAddress,
             {from: requester}
         );
-        assert.equal(taskRejectResult.logs[0].args.newState, 4); // Task reject 
+        assert.equal(taskRejectResult.logs[0].args.newState, 1); // Task ASSIGNED 
 
-        const taskRejectToVerifyResult = await contractInstance.doneTask(
+        const taskRejectToVerifyResult = await contractInstance.doTask(
             taskAddress, 
             {from: worker}
         );
-        assert.equal(taskRejectToVerifyResult.logs[0].args.newState, 1); // Task done
+        assert.equal(taskRejectToVerifyResult.logs[0].args.newState, 2); // Task VERIFY_TASK
 
     });
 
@@ -171,16 +173,20 @@ contract("TrustExchange", (accounts) => {
             {from: requester}
         );
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
-        await contractInstance.doneTaskWithTrust(
+        await contractInstance.acceptTask(
             taskAddress,
             10e18.toFixed(),
             {from: worker}
         );
-        const taskReassignResult = await contractInstance.unFinishTask(
+        await contractInstance.doTask(
+            taskAddress,
+            {from: worker}
+        );
+        const taskReassignResult = await contractInstance.cancelTask(
             taskAddress,
             {from: requester}
         );
-        assert.equal(taskReassignResult.logs[0].args.newState, 0)
+        assert.equal(taskReassignResult.logs[0].args.newState, 0); // Task is UNASSIGNED_TASK
 
         // repaymentRate = ((salary + (requesterProofOfTrust / 4)) / (salary + requesterProofOfTrust))
         // repaymentRate = ((5 + (5 / 4)) / (5 + 5)) = 0.625
@@ -207,7 +213,7 @@ contract("TrustExchange", (accounts) => {
         );
         let taskAddress = taskCreationResult.logs[0].args.taskAddr;
         try {
-            await contractInstance.doneTaskWithTrust(
+            await contractInstance.acceptTask(
                 taskAddress,
                 10e18.toFixed(),
                 {from: anonymous}
