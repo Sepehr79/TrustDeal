@@ -1,12 +1,12 @@
 const TaskState = {
     "0": "Unassigned",
-    "1": "Verify",
-    "2": "Finished",
-    "3": "Removed",
-    "4": "Rejected"
+    "1": "Assigned",
+    "2": "Verify",
+    "3": "Finished",
+    "4": "Removed",
 }
 
-function task_state_create(task, contractInstance, account, submitClick) {
+function task_state_unassigned(task, contractInstance, account, submitClick) {
     return (
         <div>
             <table className="table table-bordered table-striped">
@@ -124,11 +124,11 @@ function task_state_create(task, contractInstance, account, submitClick) {
                         </td>
                 </tr>
                 <tr>
-                    <td>Do task</td>
+                    <td>Accept task</td>
                     <td>
                         <form onSubmit={(event) => {
                                     event.preventDefault()
-                                    contractInstance.methods.doneTaskWithTrust(task.taskAddr, (event.target.proofOfTrust.value * 1e18).toFixed())
+                                    contractInstance.methods.acceptTask(task.taskAddr, (event.target.proofOfTrust.value * 1e18).toFixed())
                                     .send({ from: account })
                                     .then(result => {
                                         alert("Task state update to accepted")
@@ -137,7 +137,7 @@ function task_state_create(task, contractInstance, account, submitClick) {
                                     })
                                 }}>
                                     <input type='number' name='proofOfTrust' step='any' placeholder='Prove your trust!' />
-                                    <input type='submit' value='Do task' />
+                                    <input type='submit' value='Accept task' />
                                 </form>
                     </td>
                 </tr>
@@ -145,7 +145,7 @@ function task_state_create(task, contractInstance, account, submitClick) {
                 <td>Remove task</td>
                 <td>
                     <button onClick={event => {
-                                    contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                    contractInstance.methods.removeTask(task.taskAddr).send({ from: account })
                                     .then(result => {
                                         alert("Task canceled")
                                         submitClick()
@@ -158,7 +158,127 @@ function task_state_create(task, contractInstance, account, submitClick) {
     )
 }
 
-function task_state_done(task, contractInstance, account, submitClick) {
+function task_state_assigned(task, contractInstance, account, submitClick) {
+    return (
+        <div>
+            <table className='table table-bordered'>
+                <tr>
+                        <td>Header</td>
+                        <td>{ task.header }</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Description
+                        </td>
+                        <td>
+                            { task.description }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            State
+                        </td>
+                        <td>
+                            { TaskState[task.state] }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Requester
+                        </td>
+                        <td>
+                            { task.requester }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Worker</td>
+                        <td>
+                        { task.worker }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Salary
+                        </td>
+                        <td>
+                        { task.salary / 1e18 }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Proof of trust</td>
+                        <td>
+                        { task.requesterProofOfTrust / 1e18 }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Worker proof of trust
+                        </td>
+                        <td>
+                        { task.workerProofOfTrust / 1e18 }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>    
+                            Do task
+                        </td>
+                        <td>
+                        <form onSubmit={(event) => {
+                                        event.preventDefault()
+                                        contractInstance.methods.doTask(task.taskAddr)
+                                        .send({ from: account })
+                                        .then(result => {
+                                            alert("Task state updated to Verify")
+                                            submitClick()
+                                            console.log(result)
+                                        })
+                                    }}>
+                                <input type='submit' value='Do task' />
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            Cancel task
+                        </td>
+                        <td>
+                        <button onClick={event => {
+                                        contractInstance.methods.cancelTask(task.taskAddr).send({ from: account })
+                                        .then(result => {
+                                            alert("Task canceled")
+                                            submitClick()
+                                        }).then(result => {
+                                            fetch("http://localhost:8080/taskReviews",
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify(
+                                                    {
+                                                        
+                                                        "userAddress": task.worker,
+                                                        "taskAddress": task.taskAddr,
+                                                        "taskState": "REASSIGNED"
+
+                                                    })
+                                            })
+                                            .then(response => { response.json() })
+                                        })
+                        }}>Cancel</button>
+                        </td>
+                    </tr>
+            </table>
+        </div> 
+    )
+}
+
+
+
+
+
+function task_state_verify(task, contractInstance, account, submitClick) {
     return (
         <div>
             <table className='table table-bordered'>
@@ -228,11 +348,10 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                         contractInstance.methods.finishTask(task.taskAddr)
                                         .send({ from: account })
                                         .then(result => {
-                                            alert("Task state updated to finished")
+                                            alert("Task state updated to Finished")
                                             submitClick()
                                             console.log(result)
-                                        })
-                                        .then(result => {
+                                        }).then(result => {
                                             fetch("http://localhost:8080/taskReviews",
                                             {
                                                 method: "POST",
@@ -245,7 +364,7 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                                         "userAddress": task.worker,
                                                         "taskAddress": task.taskAddr,
                                                         "taskState": "FINISHED"
-
+                                        
                                                     })
                                             })
                                             .then(response => { response.json() })
@@ -259,18 +378,20 @@ function task_state_done(task, contractInstance, account, submitClick) {
                         </td>
                     </tr>
                     <tr>
-                        <td>Reject task</td>
-                        <td>
-                            <button onClick={event => {
-                                            contractInstance.methods.rejectTask(task.taskAddr).send({ from: account })
-                                            .then(result => {
-                                                alert("Task rejected")
-                                                submitClick()
-                                            })
-                            }}>Reject</button>
-                        </td>
+                        
+                            <td>Reject task</td>
+                            <td>
+                                <button onClick={event => {
+                                                contractInstance.methods.rejectTask(task.taskAddr).send({ from: account })
+                                                .then(result => {
+                                                    alert("Task rejected")
+                                                    submitClick()
+                                                })
+                                }}>Reject</button>
+                            </td>
                     </tr>
-                    {/* <tr>
+
+                    <tr>
                         <td>
                             Cancel task
                         </td>
@@ -280,45 +401,33 @@ function task_state_done(task, contractInstance, account, submitClick) {
                                         .then(result => {
                                             alert("Task canceled")
                                             submitClick()
+                                        }).then(result => {
+                                            fetch("http://localhost:8080/taskReviews",
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify(
+                                                    {
+                                                        
+                                                        "userAddress": task.worker,
+                                                        "taskAddress": task.taskAddr,
+                                                        "taskState": "REASSIGNED"
+
+                                                    })
+                                            })
+                                            .then(response => { response.json() })
                                         })
                         }}>Cancel</button>
                         </td>
-                    </tr> */}
-                    <tr>
-                        <td>Reassign task</td>
-                        <td>
-                        <button onClick={event => {
-                                            contractInstance.methods.unFinishTask(task.taskAddr).send({ from: account })
-                                            .then(result => {
-                                                alert("Task unfinished")
-                                                submitClick()
-                                            }).then(result => {
-                                                fetch("http://localhost:8080/taskReviews",
-                                                {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type": "application/json",
-                                                    },
-                                                    body: JSON.stringify(
-                                                        {
-                                                            
-                                                            "userAddress": task.worker,
-                                                            "taskAddress": task.taskAddr,
-                                                            "taskState": "REASSIGNED"
-    
-                                                        })
-                                                })
-                                                .then(response => { response.json() })
-                                            })
-                            }}>Reassign</button>
-                        </td>
                     </tr>
             </table>
         </div> 
     )
 }
 
-function task_state_finish(task) {
+function task_state_finished(task) {
     return (
         <div>
             <table className='table table-bordered'>
@@ -379,68 +488,7 @@ function task_state_finish(task) {
     )
 }
 
-function task_state_cancel(task) {
-    return (
-        <div>
-            <table className='table table-bordered'>
-            <tr>
-                        <td>Header</td>
-                        <td>{ task.header }</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Description
-                        </td>
-                        <td>
-                            { task.description }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            State
-                        </td>
-                        <td>
-                            { TaskState[task.state] }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Requester
-                        </td>
-                        <td>
-                            { task.requester }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Worker</td>
-                        <td>{ task.worker }</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            Salary
-                        </td>
-                        <td>
-                            { task.salary / 1e18 } Eth
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Proof of trust</td>
-                        <td>{ task.requesterProofOfTrust / 1e18 } Eth</td>
-                    </tr>
-                    <tr>
-                        <td>
-                        Worker proof of trust
-                        </td>
-                        <td>
-                            { task.workerProofOfTrust / 1e18 } Eth
-                        </td>
-                    </tr>
-            </table>
-        </div> 
-    )
-}
-
-function task_state_rejected(task, contractInstance, account, submitClick) {
+function task_state_removed(task) {
     return (
         <div>
             <table className="table table-bordered text-center">
@@ -496,54 +544,6 @@ function task_state_rejected(task, contractInstance, account, submitClick) {
                         { task.workerProofOfTrust / 1e18 } Eth
                     </td>
                 </tr>
-                <tr>
-                    <td>    
-                        Done task
-                    </td>
-                    <td>
-                    <form onSubmit={(event) => {
-                                    event.preventDefault()
-                                    contractInstance.methods.doneTask(task.taskAddr)
-                                    .send({ from: account })
-                                    .then(result => {
-                                        alert("Task state updated to done")
-                                        submitClick()
-                                        console.log(result)
-                                    })
-                                }}>
-                            <input type='submit' value='Done task' />
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Reassign task</td>
-                    <td>
-                    <button onClick={event => {
-                                            contractInstance.methods.unFinishTask(task.taskAddr).send({ from: account })
-                                            .then(result => {
-                                                alert("Task unfinished")
-                                                submitClick()
-                                            }).then(result => {
-                                                fetch("http://localhost:8080/taskReviews",
-                                                {
-                                                    method: "POST",
-                                                    headers: {
-                                                        "Content-Type": "application/json",
-                                                    },
-                                                    body: JSON.stringify(
-                                                        {
-                                                            
-                                                            "userAddress": task.worker,
-                                                            "taskAddress": task.taskAddr,
-                                                            "taskState": "REASSIGNED"
-    
-                                                        })
-                                                })
-                                                .then(response => { response.json() })
-                                            })
-                            }}>Unfinish</button>
-                    </td>
-                </tr>
             </table>
         </div> 
     )
@@ -554,11 +554,11 @@ const TaskTable = ({ task, contractInstance, account, submitClick }) => {
 
     
     switch(task.state) {
-        case "0": return task_state_create(task, contractInstance, account, submitClick)
-        case "1": return task_state_done(task, contractInstance, account, submitClick)
-        case "2": return task_state_finish(task)
-        case "3": return task_state_cancel(task)
-        case "4": return task_state_rejected(task, contractInstance, account, submitClick)
+        case "0": return task_state_unassigned(task, contractInstance, account, submitClick)
+        case "1": return task_state_assigned(task, contractInstance, account, submitClick)
+        case "2": return task_state_verify(task, contractInstance, account, submitClick)
+        case "3": return task_state_finished(task)
+        case "4": return task_state_removed(task, contractInstance, account, submitClick)
         default: return ( "" ) 
     }
     
