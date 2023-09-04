@@ -149,7 +149,9 @@ contract TrustExchange is Strongbox {
     }
 
     function _removeTask(Task storage _task) private {
-        unlock(_task.requester, _task.salary + _task.requesterProofOfTrust);
+        uint burnValue = _task.requesterProofOfTrust / 4;
+        burn(_task.requester, burnValue);
+        unlock(_task.requester, _task.salary + _task.requesterProofOfTrust - burnValue);
         _task.state = TaskState.REMOVED_TASK;
     }
 

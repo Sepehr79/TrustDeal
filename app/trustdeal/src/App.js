@@ -19,7 +19,7 @@ const provider = sdk.getProvider()
 const web3js = new Web3(provider)
 
 const contractABI = require('./TrustExchange.json').abi
-const contractAddress = '0x428146D20Aa07AD2B8241DF900da1f838fFcB208'
+const contractAddress = '0x538f07402eEA86615d788c22E8b95FA9edfDB41a'
 
 
 function App() {
