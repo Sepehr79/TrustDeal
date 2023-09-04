@@ -102,7 +102,7 @@ contract("TrustExchange", (accounts) => {
 
         // Unlock funds
         let unlockedFund = await contractInstance.ownerToFunds(requester);
-        assert.equal(parseInt(unlockedFund.actual), 5e18); 
+        assert.equal(parseInt(unlockedFund.actual), 45e17); 
 
     })
 
